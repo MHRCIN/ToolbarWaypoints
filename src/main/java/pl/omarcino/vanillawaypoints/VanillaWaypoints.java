@@ -7,6 +7,11 @@ import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.omarcino.vanillawaypoints.command.WaypointCommands;
+import pl.omarcino.vanillawaypoints.network.WaypointNetworking;
+import pl.omarcino.vanillawaypoints.waypoint.DeathWaypointManager;
+import pl.omarcino.vanillawaypoints.waypoint.WaypointSync;
+
 public class VanillaWaypoints implements ModInitializer {
 	public static final String MOD_ID = "vanilla-waypoints";
 
@@ -17,11 +22,11 @@ public class VanillaWaypoints implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
-
-		LOGGER.info("Hello Fabric world!");
+		WaypointNetworking.register();
+		WaypointCommands.register();
+		WaypointSync.registerEvents();
+		DeathWaypointManager.registerEvents();
+		LOGGER.info("Vanilla Waypoints initialized");
 	}
 
 	public static Identifier id(String path) {
