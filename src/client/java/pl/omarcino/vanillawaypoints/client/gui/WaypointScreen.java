@@ -181,11 +181,16 @@ public final class WaypointScreen extends Screen {
 					: Component.translatable("gui.vanilla-waypoints.color.change")));
 			addRenderableWidget(color);
 
-			int nameRightPadding = editMode ? 54 : 42;
+			int nameRightPadding = editMode
+					? (entry.owned() ? 54 : 36)
+					: 42;
 			int labelWidth = Math.max(30, innerRight - (innerLeft + 23) - nameRightPadding);
-			Component baseLabel = entry.death()
+			Component waypointName = entry.death()
 					? Component.translatable("gui.vanilla-waypoints.death.numbered", deathDisplayNumber(entry))
 					: Component.literal(entry.name());
+			Component baseLabel = entry.owned()
+					? waypointName
+					: Component.translatable("gui.vanilla-waypoints.shared_point", waypointName);
 			Component label = (expanded
 					? Component.translatable("gui.vanilla-waypoints.name_with_dimension", baseLabel, dimensionName(entry.dimension()))
 					: baseLabel)
@@ -207,21 +212,24 @@ public final class WaypointScreen extends Screen {
 			}
 
 			if (editMode) {
+				int worldButtonX = entry.owned() ? innerRight - 50 : innerRight - 32;
 				Button worldRendering = Button.builder(
 						Component.literal(entry.renderInWorld() ? "3D+" : "3D−")
 								.withStyle(Style.EMPTY.withColor(entry.renderInWorld() ? 0xFFFFFF : 0x888888)),
 						button -> sendAction(entry.id(), WaypointPayloads.Action.TOGGLE_WORLD_RENDERING, 0)
-				).bounds(innerRight - 50, rowY + 1, 30, 17).build();
+				).bounds(worldButtonX, rowY + 1, 30, 17).build();
 				worldRendering.setTooltip(Tooltip.create(Component.translatable(entry.renderInWorld()
 						? "gui.vanilla-waypoints.world_rendering.disable"
 						: "gui.vanilla-waypoints.world_rendering.enable")));
 				addRenderableWidget(worldRendering);
 
-				Button delete = Button.builder(Component.literal("×"), button -> sendAction(entry.id(), WaypointPayloads.Action.DELETE, 0))
-						.bounds(innerRight - 18, rowY + 1, 16, 17).build();
-				delete.setTooltip(Tooltip.create(Component.translatable("gui.vanilla-waypoints.delete")));
-				addRenderableWidget(delete);
-			} else {
+				if (entry.owned()) {
+					Button delete = Button.builder(Component.literal("×"), button -> sendAction(entry.id(), WaypointPayloads.Action.DELETE, 0))
+							.bounds(innerRight - 18, rowY + 1, 16, 17).build();
+					delete.setTooltip(Tooltip.create(Component.translatable("gui.vanilla-waypoints.delete")));
+					addRenderableWidget(delete);
+				}
+			} else if (!editMode) {
 				Button visible = Button.builder(
 						Component.literal(entry.enabled() ? "◆" : "◇"),
 						button -> sendAction(entry.id(), WaypointPayloads.Action.TOGGLE_VISIBILITY, 0)

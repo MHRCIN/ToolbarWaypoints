@@ -15,6 +15,7 @@ import pl.omarcino.vanillawaypoints.waypoint.CustomWaypoint;
 import pl.omarcino.vanillawaypoints.waypoint.DeathWaypointManager;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointData;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointKind;
+import pl.omarcino.vanillawaypoints.waypoint.WaypointPreferences;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointSync;
 
 import java.util.Locale;
@@ -176,6 +177,7 @@ public final class WaypointCommands {
 			return notFound(source, name);
 		}
 
+		WaypointPreferences.get(source.getServer()).removeWaypoint(removed.get().id());
 		WaypointSync.refreshAll(source.getServer());
 		source.sendSuccess(() -> Component.translatable("command.vanilla-waypoints.removed", removed.get().name()), false);
 		return 1;

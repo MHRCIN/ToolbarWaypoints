@@ -34,6 +34,7 @@
   "gui.vanilla-waypoints.empty": "Brak waypointów",
   "gui.vanilla-waypoints.death": "Śmierć",
   "gui.vanilla-waypoints.death.numbered": "Śmierć #%s",
+  "gui.vanilla-waypoints.shared_point": "↗ %s",
   "gui.vanilla-waypoints.delete": "Usuń waypoint",
   "gui.vanilla-waypoints.visibility.hide": "Ukryj waypoint",
   "gui.vanilla-waypoints.visibility.show": "Pokaż waypoint",

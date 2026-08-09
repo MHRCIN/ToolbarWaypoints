@@ -150,6 +150,10 @@ public final class WaypointData extends SavedData {
 				: Optional.empty();
 	}
 
+	public Optional<CustomWaypoint> findById(UUID waypointId) {
+		return Optional.ofNullable(waypoints.get(waypointId));
+	}
+
 	public Optional<CustomWaypoint> updateOwnedById(
 			UUID ownerId,
 			UUID waypointId,

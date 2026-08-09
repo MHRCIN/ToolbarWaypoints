@@ -8,9 +8,9 @@ import net.minecraft.server.level.ServerPlayer;
 import pl.omarcino.vanillawaypoints.waypoint.CustomWaypoint;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointData;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointKind;
+import pl.omarcino.vanillawaypoints.waypoint.WaypointPreferences;
 import pl.omarcino.vanillawaypoints.waypoint.WaypointSync;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -41,21 +41,23 @@ public final class WaypointNetworking {
 		}
 
 		WaypointData data = WaypointData.get(player.level().getServer());
-		List<CustomWaypoint> owned = new ArrayList<>(data.ownedBy(player.getUUID()));
-		owned.addAll(data.deathWaypoints(player.getUUID()));
-		owned.sort(Comparator.comparingLong(CustomWaypoint::createdAt).reversed());
-
-		List<WaypointPayloads.Entry> entries = owned.stream()
+		WaypointPreferences preferences = WaypointPreferences.get(player.level().getServer());
+		UUID playerId = player.getUUID();
+		List<WaypointPayloads.Entry> entries = data.all().stream()
+				.filter(waypoint -> waypoint.ownerId().equals(playerId) || waypoint.shared())
+				.sorted(Comparator.comparingLong(CustomWaypoint::createdAt).reversed())
+				.limit(WaypointPayloads.MAX_SNAPSHOT_SIZE)
 				.map(waypoint -> new WaypointPayloads.Entry(
 						waypoint.id(),
 						waypoint.name(),
 						waypoint.dimension().identifier().toString(),
 						waypoint.position(),
 						waypoint.kind() == WaypointKind.DEATH ? 0xFFFFFF : waypoint.color(),
-						waypoint.enabled(),
+						preferences.enabledFor(playerId, waypoint),
 						waypoint.shared(),
-						waypoint.renderInWorld(),
-						waypoint.kind() == WaypointKind.DEATH
+						preferences.renderInWorldFor(playerId, waypoint),
+						waypoint.kind() == WaypointKind.DEATH,
+						waypoint.ownerId().equals(playerId)
 				))
 				.toList();
 
@@ -98,31 +100,51 @@ public final class WaypointNetworking {
 
 	private static void handleAction(ServerPlayer player, WaypointPayloads.Action payload) {
 		WaypointData data = WaypointData.get(player.level().getServer());
-		Optional<CustomWaypoint> existing = data.findOwnedById(player.getUUID(), payload.waypointId());
-		if (existing.isEmpty()) {
+		WaypointPreferences preferences = WaypointPreferences.get(player.level().getServer());
+		Optional<CustomWaypoint> existing = data.findById(payload.waypointId());
+		if (existing.isEmpty()
+				|| !existing.get().ownerId().equals(player.getUUID()) && !existing.get().shared()) {
 			sendSnapshot(player);
 			return;
 		}
+		CustomWaypoint waypoint = existing.get();
+		boolean owned = waypoint.ownerId().equals(player.getUUID());
+		UUID ownerId = waypoint.ownerId();
 
 		boolean changed = switch (payload.action()) {
-			case WaypointPayloads.Action.TOGGLE_VISIBILITY -> data.updateOwnedById(
-					player.getUUID(), payload.waypointId(), waypoint -> waypoint.withEnabled(!waypoint.enabled())
-			).isPresent();
-			case WaypointPayloads.Action.DELETE -> data.removeOwnedById(player.getUUID(), payload.waypointId());
-			case WaypointPayloads.Action.SET_COLOR -> existing.get().kind() == WaypointKind.CUSTOM
+			case WaypointPayloads.Action.TOGGLE_VISIBILITY -> owned
+					? data.updateOwnedById(
+							ownerId, payload.waypointId(), current -> current.withEnabled(!current.enabled())
+					).isPresent()
+					: preferences.toggleVisibility(player.getUUID(), waypoint);
+			case WaypointPayloads.Action.DELETE -> {
+				boolean removed = owned && data.removeOwnedById(ownerId, payload.waypointId());
+				if (removed) {
+					preferences.removeWaypoint(payload.waypointId());
+				}
+				yield removed;
+			}
+			case WaypointPayloads.Action.SET_COLOR -> waypoint.kind() == WaypointKind.CUSTOM
 					&& payload.value() >= 0
 					&& payload.value() <= 0xFFFFFF
 					&& data.updateOwnedById(
-							player.getUUID(), payload.waypointId(), waypoint -> waypoint.withColor(payload.value())
+							ownerId, payload.waypointId(), current -> current.withColor(payload.value())
 					).isPresent();
-			case WaypointPayloads.Action.TOGGLE_WORLD_RENDERING -> data.updateOwnedById(
-					player.getUUID(), payload.waypointId(), waypoint -> waypoint.withRenderInWorld(!waypoint.renderInWorld())
-			).isPresent();
+			case WaypointPayloads.Action.TOGGLE_WORLD_RENDERING -> owned
+					? data.updateOwnedById(
+							ownerId, payload.waypointId(), current -> current.withRenderInWorld(!current.renderInWorld())
+					).isPresent()
+					: preferences.toggleWorldRendering(player.getUUID(), waypoint);
 			default -> false;
 		};
 
 		if (changed) {
-			WaypointSync.refreshAll(player.level().getServer());
+			if (payload.action() == WaypointPayloads.Action.TOGGLE_VISIBILITY
+					|| payload.action() == WaypointPayloads.Action.TOGGLE_WORLD_RENDERING) {
+				WaypointSync.refreshPlayer(player);
+			} else {
+				WaypointSync.refreshAll(player.level().getServer());
+			}
 		} else {
 			sendSnapshot(player);
 		}

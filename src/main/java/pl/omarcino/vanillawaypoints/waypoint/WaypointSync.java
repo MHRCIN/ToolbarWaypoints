@@ -48,10 +48,11 @@ public final class WaypointSync {
 
 	public static void refreshPlayer(ServerPlayer player) {
 		WaypointData data = WaypointData.get(player.level().getServer());
+		WaypointPreferences preferences = WaypointPreferences.get(player.level().getServer());
 		UUID playerId = player.getUUID();
 
 		Map<UUID, CustomWaypoint> desired = data.all().stream()
-				.filter(CustomWaypoint::enabled)
+				.filter(waypoint -> preferences.enabledFor(playerId, waypoint))
 				.filter(waypoint -> waypoint.dimension().equals(player.level().dimension()))
 				.filter(waypoint -> waypoint.ownerId().equals(playerId) || waypoint.shared())
 				.collect(Collectors.toMap(CustomWaypoint::id, Function.identity()));

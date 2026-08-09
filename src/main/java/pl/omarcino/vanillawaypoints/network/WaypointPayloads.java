@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class WaypointPayloads {
-	private static final int MAX_SNAPSHOT_SIZE = 256;
+	public static final int MAX_SNAPSHOT_SIZE = 256;
 
 	private WaypointPayloads() {
 	}
@@ -26,7 +26,8 @@ public final class WaypointPayloads {
 			boolean enabled,
 			boolean shared,
 			boolean renderInWorld,
-			boolean death
+			boolean death,
+			boolean owned
 	) {
 		private static void encode(RegistryFriendlyByteBuf buffer, Entry entry) {
 			buffer.writeUUID(entry.id);
@@ -38,6 +39,7 @@ public final class WaypointPayloads {
 			buffer.writeBoolean(entry.shared);
 			buffer.writeBoolean(entry.renderInWorld);
 			buffer.writeBoolean(entry.death);
+			buffer.writeBoolean(entry.owned);
 		}
 
 		private static Entry decode(RegistryFriendlyByteBuf buffer) {
@@ -47,6 +49,7 @@ public final class WaypointPayloads {
 					buffer.readUtf(256),
 					buffer.readBlockPos(),
 					buffer.readInt(),
+					buffer.readBoolean(),
 					buffer.readBoolean(),
 					buffer.readBoolean(),
 					buffer.readBoolean(),
