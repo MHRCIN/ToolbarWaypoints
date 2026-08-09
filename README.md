@@ -1,11 +1,11 @@
 # Vanilla Waypoints
 
 Vanilla Waypoints is a Fabric mod that adds custom and death waypoints while using Minecraft's native Locator Bar.
+![Toolbar preview screen](screenshots/toolbar-preview.png)
+
 
 Waypoints can also be displayed as scalable 3D labels in the world.
-
 ![Waypoint preview screen](screenshots/waypoint-preview.png)
-
 
 
 
@@ -18,7 +18,7 @@ Waypoints can also be displayed as scalable 3D labels in the world.
 | Fabric API | 0.156.0+26.2 or a compatible 26.2 release |
 | Java | 25 or newer |
 
-The mod must be installed on the LAN host/server and on every player who needs to use its interface, synchronization, or 3D rendering.
+The mod must be installed on the LAN host/server and on every player who needs to use it
 
 ## Installation
 
@@ -36,16 +36,15 @@ On Windows, the standard mods directory is:
 
 ## Waypoint screen
 
-Press **U** to open the waypoint screen. Press **U** again to close it. The shortcut will not close the screen while a text field is focused, so names containing the letter `U` can be entered normally.
+Press **U** to open the waypoint screen. 
 
 ![Waypoint management screen](screenshots/waypoint-menu.png)
 
 ### Adding a waypoint
 
 1. Enter a name.
-2. Click the color square to cycle through colors. The initial color is randomized each time the screen opens.
-3. Leave the coordinate section collapsed to use the player's current position.
-4. Expand the coordinate section to enter custom X, Y, and Z values.
+2. Click the color square to cycle through colors.
+3. (Optional) Expand the coordinate section to enter custom X, Y, and Z values.
 5. Select **ADD**.
 
 Waypoint names may contain 1–32 letters, numbers, underscores, or hyphens.
@@ -56,9 +55,6 @@ Waypoint names may contain 1–32 letters, numbers, underscores, or hyphens.
 - Expand a row to display its X, Y, Z, and dimension information.
 - Click a waypoint's color square to cycle its color.
 - Select **EDIT** to reveal the `3D+`/`3D−` control and owner-only delete button.
-- Use the mouse wheel over the waypoint list to scroll.
-
-Visibility is the master switch. A hidden waypoint is not displayed on either the Locator Bar or as a 3D label. The separate 3D setting only controls the in-world label.
 
 ## Player-specific visibility
 
@@ -69,7 +65,8 @@ Visibility and 3D rendering are personal settings:
 - Personal settings are stored by player UUID and survive reconnecting to the world.
 - Hidden shared waypoints remain in the menu and can be enabled again.
 
-The waypoint color is shared. Changing the color of a shared waypoint updates it for all players. Only the owner can delete the waypoint.
+The waypoint color is shared. Changing the color of a shared waypoint updates it for all players. 
+** Only the owner can delete the waypoint. **
 
 ## Sharing waypoints
 
@@ -91,7 +88,6 @@ When a player dies, the mod creates a white skull waypoint named `Death #1`, `De
 - Up to five recent death waypoints are retained.
 - When another death occurs, markers outside the five-minute history window are removed.
 - Reaching within four blocks of a death location removes that marker after a short safety delay.
-- Removing a reached marker plays a quiet experience-orb pickup sound instead of sending a chat notification.
 - Death waypoints are private and belong to the player who died.
 
 All death waypoints can be removed manually with:
@@ -130,14 +126,6 @@ All death waypoints can be removed manually with:
 /point color home gold
 /point share village
 ```
-
-## Locator Bar and dimensions
-
-Only waypoints in the player's current dimension are sent to the native Locator Bar. A waypoint in the Nether will not appear while the player is in the Overworld, and vice versa.
-
-The Locator Bar represents horizontal direction and does not provide a useful Y-axis indication. The optional 3D label solves this by appearing at the waypoint's real world position and displaying its distance from the player.
-
-Locator Bar appearance and behavior may still be affected by Minecraft's native HUD rules because the mod deliberately uses the vanilla system.
 
 ## Multiplayer behavior and permissions
 
