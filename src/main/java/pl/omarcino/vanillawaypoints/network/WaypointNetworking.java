@@ -54,6 +54,7 @@ public final class WaypointNetworking {
 						waypoint.kind() == WaypointKind.DEATH ? 0xFFFFFF : waypoint.color(),
 						waypoint.enabled(),
 						waypoint.shared(),
+						waypoint.renderInWorld(),
 						waypoint.kind() == WaypointKind.DEATH
 				))
 				.toList();
@@ -83,6 +84,7 @@ public final class WaypointNetworking {
 				payload.color(),
 				true,
 				false,
+				true,
 				System.currentTimeMillis(),
 				WaypointKind.CUSTOM
 		);
@@ -113,6 +115,9 @@ public final class WaypointNetworking {
 					&& data.updateOwnedById(
 							player.getUUID(), payload.waypointId(), waypoint -> waypoint.withColor(payload.value())
 					).isPresent();
+			case WaypointPayloads.Action.TOGGLE_WORLD_RENDERING -> data.updateOwnedById(
+					player.getUUID(), payload.waypointId(), waypoint -> waypoint.withRenderInWorld(!waypoint.renderInWorld())
+			).isPresent();
 			default -> false;
 		};
 

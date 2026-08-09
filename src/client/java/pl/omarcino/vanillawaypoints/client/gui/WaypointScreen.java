@@ -181,7 +181,7 @@ public final class WaypointScreen extends Screen {
 					: Component.translatable("gui.vanilla-waypoints.color.change")));
 			addRenderableWidget(color);
 
-			int nameRightPadding = editMode ? 22 : 42;
+			int nameRightPadding = editMode ? 54 : 42;
 			int labelWidth = Math.max(30, innerRight - (innerLeft + 23) - nameRightPadding);
 			Component baseLabel = entry.death()
 					? Component.translatable("gui.vanilla-waypoints.death.numbered", deathDisplayNumber(entry))
@@ -207,6 +207,16 @@ public final class WaypointScreen extends Screen {
 			}
 
 			if (editMode) {
+				Button worldRendering = Button.builder(
+						Component.literal(entry.renderInWorld() ? "3D+" : "3D−")
+								.withStyle(Style.EMPTY.withColor(entry.renderInWorld() ? 0xFFFFFF : 0x888888)),
+						button -> sendAction(entry.id(), WaypointPayloads.Action.TOGGLE_WORLD_RENDERING, 0)
+				).bounds(innerRight - 50, rowY + 1, 30, 17).build();
+				worldRendering.setTooltip(Tooltip.create(Component.translatable(entry.renderInWorld()
+						? "gui.vanilla-waypoints.world_rendering.disable"
+						: "gui.vanilla-waypoints.world_rendering.enable")));
+				addRenderableWidget(worldRendering);
+
 				Button delete = Button.builder(Component.literal("×"), button -> sendAction(entry.id(), WaypointPayloads.Action.DELETE, 0))
 						.bounds(innerRight - 18, rowY + 1, 16, 17).build();
 				delete.setTooltip(Tooltip.create(Component.translatable("gui.vanilla-waypoints.delete")));

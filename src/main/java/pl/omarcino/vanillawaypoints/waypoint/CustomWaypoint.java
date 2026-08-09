@@ -18,6 +18,7 @@ public record CustomWaypoint(
 		int color,
 		boolean enabled,
 		boolean shared,
+		boolean renderInWorld,
 		long createdAt,
 		WaypointKind kind
 ) {
@@ -32,19 +33,24 @@ public record CustomWaypoint(
 			Codec.INT.optionalFieldOf("color", DEFAULT_COLOR).forGetter(CustomWaypoint::color),
 			Codec.BOOL.optionalFieldOf("enabled", true).forGetter(CustomWaypoint::enabled),
 			Codec.BOOL.optionalFieldOf("shared", false).forGetter(CustomWaypoint::shared),
+			Codec.BOOL.optionalFieldOf("render_in_world", true).forGetter(CustomWaypoint::renderInWorld),
 			Codec.LONG.optionalFieldOf("created_at", 0L).forGetter(CustomWaypoint::createdAt),
 			WaypointKind.CODEC.optionalFieldOf("kind", WaypointKind.CUSTOM).forGetter(CustomWaypoint::kind)
 	).apply(instance, CustomWaypoint::new));
 
 	public CustomWaypoint withColor(int newColor) {
-		return new CustomWaypoint(id, ownerId, name, dimension, position, newColor, enabled, shared, createdAt, kind);
+		return new CustomWaypoint(id, ownerId, name, dimension, position, newColor, enabled, shared, renderInWorld, createdAt, kind);
 	}
 
 	public CustomWaypoint withEnabled(boolean newEnabled) {
-		return new CustomWaypoint(id, ownerId, name, dimension, position, color, newEnabled, shared, createdAt, kind);
+		return new CustomWaypoint(id, ownerId, name, dimension, position, color, newEnabled, shared, renderInWorld, createdAt, kind);
 	}
 
 	public CustomWaypoint withShared(boolean newShared) {
-		return new CustomWaypoint(id, ownerId, name, dimension, position, color, enabled, newShared, createdAt, kind);
+		return new CustomWaypoint(id, ownerId, name, dimension, position, color, enabled, newShared, renderInWorld, createdAt, kind);
+	}
+
+	public CustomWaypoint withRenderInWorld(boolean newRenderInWorld) {
+		return new CustomWaypoint(id, ownerId, name, dimension, position, color, enabled, shared, newRenderInWorld, createdAt, kind);
 	}
 }

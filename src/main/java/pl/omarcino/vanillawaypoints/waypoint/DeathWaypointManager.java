@@ -56,6 +56,7 @@ public final class DeathWaypointManager {
 				DEATH_COLOR,
 				true,
 				false,
+				true,
 				System.currentTimeMillis(),
 				WaypointKind.DEATH
 		);

@@ -25,6 +25,7 @@ public final class WaypointPayloads {
 			int color,
 			boolean enabled,
 			boolean shared,
+			boolean renderInWorld,
 			boolean death
 	) {
 		private static void encode(RegistryFriendlyByteBuf buffer, Entry entry) {
@@ -35,6 +36,7 @@ public final class WaypointPayloads {
 			buffer.writeInt(entry.color);
 			buffer.writeBoolean(entry.enabled);
 			buffer.writeBoolean(entry.shared);
+			buffer.writeBoolean(entry.renderInWorld);
 			buffer.writeBoolean(entry.death);
 		}
 
@@ -45,6 +47,7 @@ public final class WaypointPayloads {
 					buffer.readUtf(256),
 					buffer.readBlockPos(),
 					buffer.readInt(),
+					buffer.readBoolean(),
 					buffer.readBoolean(),
 					buffer.readBoolean(),
 					buffer.readBoolean()
@@ -118,6 +121,7 @@ public final class WaypointPayloads {
 		public static final int TOGGLE_VISIBILITY = 0;
 		public static final int DELETE = 1;
 		public static final int SET_COLOR = 2;
+		public static final int TOGGLE_WORLD_RENDERING = 3;
 
 		public static final Type<Action> TYPE = new Type<>(VanillaWaypoints.id("waypoint_action"));
 		public static final StreamCodec<RegistryFriendlyByteBuf, Action> CODEC = StreamCodec.of(

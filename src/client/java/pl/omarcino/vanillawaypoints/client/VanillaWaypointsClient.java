@@ -10,6 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 
 import pl.omarcino.vanillawaypoints.VanillaWaypoints;
 import pl.omarcino.vanillawaypoints.client.gui.WaypointScreen;
+import pl.omarcino.vanillawaypoints.client.render.WaypointWorldRenderer;
 import pl.omarcino.vanillawaypoints.network.WaypointPayloads;
 
 public final class VanillaWaypointsClient implements ClientModInitializer {
@@ -26,6 +27,8 @@ public final class VanillaWaypointsClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		WaypointWorldRenderer.register();
+
 		ClientPlayNetworking.registerGlobalReceiver(WaypointPayloads.Snapshot.TYPE, (payload, context) ->
 				WaypointClientState.replace(payload.entries())
 		);

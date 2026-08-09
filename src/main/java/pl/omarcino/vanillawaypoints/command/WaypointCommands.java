@@ -150,6 +150,7 @@ public final class WaypointCommands {
 				color,
 				true,
 				false,
+				true,
 				System.currentTimeMillis(),
 				WaypointKind.CUSTOM
 		);
